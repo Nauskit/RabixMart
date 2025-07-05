@@ -9,7 +9,7 @@ const limiter = rateLimit({
   message: "Too many attempts, please try again later",
 });
 
-router.post("login", authController.login);
+router.post("/login", limiter, authController.login);
 router.post("/register", authController.register);
 
 module.exports = router;
