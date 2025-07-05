@@ -1,9 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
-
 export default function Homepage() {
-  const [isLoggin, setIsLoggin] = useState(false);
-
   const products = [
     {
       id: 1,
