@@ -10,8 +10,8 @@ exports.register = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
   try {
-    const exitingUser = await User.findOne({ username });
-    if (exitingUser) {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
       return res.status(401).json({ message: "username are already use" });
     }
     const hashPassword = await bcrypt.hash(password, SALT_ROUND);

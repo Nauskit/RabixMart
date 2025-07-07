@@ -1,30 +1,36 @@
+import { useEffect, useState } from "react";
+
 export default function Homepage() {
-  const products = [
-    {
-      id: 1,
-      name: "Minimalist Watch",
-      price: "$99.00",
-      image: "https://images.unsplash.com/photo-1523275335658-0f3d3f4032b0",
-    },
-    {
-      id: 2,
-      name: "Leather Bag",
-      price: "$149.00",
-      image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d",
-    },
-    {
-      id: 3,
-      name: "Sneakers",
-      price: "$79.00",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-    },
-    {
-      id: 4,
-      name: "Sunglasses",
-      price: "$59.00",
-      image: "https://images.unsplash.com/photo-1577805947697-89e182386d99",
-    },
-  ];
+
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState('');
+  const [isLogin, setIsLogin] = useState(false);
+
+
+  useEffect(() => {
+
+    const fethProduct = async () => {
+      try {
+        const resProduct = await fetch('http://localhost:3000/product/', {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        const data = await resProduct.json();
+        setProducts(data);
+        setIsLogin(true);
+      } catch (err) {
+        setError(err.message)
+      }
+    }
+
+
+    fethProduct();
+  }, [])
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -42,9 +48,16 @@ export default function Homepage() {
               <a href="/cart" className="text-gray-600 hover:text-indigo-600">
                 Cart
               </a>
-              <a href="/login" className="text-gray-600 hover:text-indigo-600">
-                Login
-              </a>
+              {!isLogin ? (
+                <a href="/login" className="text-gray-600 hover:text-indigo-600">
+                  Login
+                </a>
+              ) : (
+                <a className="text-gray-600 hover:text-indigo-600">
+                  {localStorage.getItem("username")}
+                </a>
+              )}
+
             </div>
           </div>
         </div>
@@ -81,22 +94,23 @@ export default function Homepage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <div
-              key={product.id}
+              key={product._id}
               className="bg-white rounded-lg shadow-md overflow-hidden"
             >
               <img
-                src={product.image}
-                alt={product.name}
+                src={product.imageUrl}
+                alt={product.productName}
                 className="w-full h-64 object-cover"
               />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {product.name}
+              <div className="p-4 flex flex-col h-[calc(100%-16rem)]">
+                <h3 className="text-lg font-semibold text-gray-900 ">
+                  {product.productName}
                 </h3>
-                <p className="text-gray-600">{product.price}</p>
+                <p className="text-gray-600">Created by: {product.owner?.username}</p>
+                <p className="text-gray-600">Price: {product.price}</p>
                 <a
-                  href={`/product/${product.id}`}
-                  className="mt-4 inline-block bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
+                  href={`/product/${product._id}`}
+                  className="mt-auto inline-block bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 text-center"
                 >
                   View Details
                 </a>
