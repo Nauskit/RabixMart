@@ -1,22 +1,20 @@
+const order = require('../models/order');
 const Order = require('../models/order')
-const Product = require('../models/order')
+const Product = require('../models/product')
 
 exports.createOrder = async (req, res) => {
     const userId = req.user.id;
     const { products } = req.body;
-    if (!products || products.length === 0) {
-        return res.status(400).json({ message: "Products are required" });
-    }
+    if (!products || products.length === 0) return res.status(400).json({ message: "Products are required" });
 
     try {
         let totalPrice = 0;
         const orderItems = [];
         for (const item of products) { // loop product
+
             const product = await Product.findById(item.productId); //find product
 
-            if (!product) {
-                return res.status(404).json({ meesage: "product not found" })
-            }
+            if (!product) return res.status(404).json({ meesage: "product not found" })
 
             if (product.stock < item.quantity) {
                 return res.status(400).json({
@@ -99,12 +97,20 @@ exports.updateOrderStatus = async (req, res) => {
 }
 
 exports.deleteOrder = async (req, res) => {
-    const orderId = req.params.id;
+    const { orderId, productId } = req.params;
     try {
-        const deleteProduct = await Order.findByIdAndDelete(orderId);
+        const deleteProduct = await Order.findById(orderId);
         if (!deleteProduct) {
             return res.status(404).json({ message: "Order not found" })
         }
+        deleteProduct.products = deleteProduct.products.filter(p => p._id.toString() !== productId);
+
+        if (order.products.length === 0) {
+            await Order.findByIdAndDelete(orderId);
+            return res.status(200).json({ message: "Order Deleted, Product is emptys" })
+        }
+
+        await deleteProduct.save();
         return res.status(200).json({ message: "Order deleted successfully" })
     } catch (err) {
         return res.status(500).json({ message: "Server Error: ", error: err.message })

@@ -34,7 +34,7 @@ export default function LoginPage() {
       localStorage.setItem("username", data.username);
 
       alert("Login successfully");
-      navigate("/homepage");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
